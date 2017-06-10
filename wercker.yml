@@ -1,0 +1,42 @@
+box: node:8
+
+build-initial:
+  steps:
+    - script:
+      name: echo nodejs information
+      code: |
+        echo "node version $(node -v) running"
+        echo "npm version $(npm -v) running"
+
+    - npm-install
+
+    - script:
+      name: generate image tag
+      code: |
+        export GIT_COMMIT=$(git rev-parse --short HEAD)
+        echo "GIT_COMMI: $GIT_COMMIT"
+
+        export PACKAGE_VERSION=$(node -p "require('./package.json').version")
+        echo "PACKAGE_VERSION: $PACKAGE_VERSION"
+
+        if [ "$WERCKER_GIT_BRANCH" == "master" ]; then
+          export IMAGE_TAG=$PACKAGE_VERSION
+
+        elif [[ "$WERCKER_GIT_BRANCH" =~ ^release.* ]]; then
+          export IMAGE_TAG="$PACKAGE_VERSION-beta-$GIT_COMMIT"
+
+        else
+          export IMAGE_TAG="$PACKAGE_VERSION-alpha-$GIT_COMMIT"
+
+        fi
+
+        echo "$IMAGE_TAG" >> $WERCKER_SOURCE_DIR/.image_tag
+        echo "IMAGE_TAG: $IMAGE_TAG"
+
+
+test:
+  steps:
+    - script:
+      code: npm run lint
+
+    - npm-test
