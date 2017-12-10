@@ -4,7 +4,7 @@ const app = new Koa()
 
 const NODE_ENV = process.env.NODE_ENV || 'production'
 const HOST = process.env.SERVICE_HOST || 'localhost'
-const PORT = process.env.PORT || process.env.SERVICE_PORT || 3000
+const PORT = process.env.PORT || process.env.SERVICE_PORT || 8080
 const THEME = process.env.THEME || 'alone'
 
 app.use(async (ctx, next) => {
